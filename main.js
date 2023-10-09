@@ -6,12 +6,6 @@ import viteLogo from '/vite.svg'
 
 document.querySelector('#app').innerHTML = `
   <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
     <h1>Hello Vite!</h1>
     <div class="card">
       <button id="counter" type="button"></button>
@@ -127,7 +121,6 @@ const branchListView = ( brandList , provinces) => {
 }
 
 // GET provinces list
-
 const getProvincesList = (provincesAll) => {
   let provincesList = [];
   provincesAll.forEach(each => {
@@ -138,19 +131,44 @@ const getProvincesList = (provincesAll) => {
 }
 
 const viewProvincesList = ( provincesList ) => {
-  const bb = document.getElementById("province");
   provincesList.forEach(each => {
     const option = document.createElement('option')
     option.setAttribute("value", each.code)
     option.innerHTML = each.name
-    bb.append(option);
+    inputProvince.append(option);
   });
 }
+
+//GET district list
+const getDistrictList = ( provincesAll, province ) => {
+  let districtList = [];
+  const currentProvince = provincesAll.find(data => data.code == province);
+  currentProvince?.districts.forEach( each => {
+    districtList.push({code: each.code, name: each.name})
+  })
+  return districtList;
+}
+
+const viewDistrictList = ( districtList ) => {
+  const defaultDistrict = document.createElement('option')
+  defaultDistrict.setAttribute("value" , 0);
+  defaultDistrict.innerHTML = "Choose district";
+  inputDistrict.innerText = '';
+  inputDistrict.append(defaultDistrict);
+
+  districtList.forEach(each => {
+    const option = document.createElement('option')
+    option.setAttribute("value", each.code)
+    option.innerHTML = each.name
+    inputDistrict.append(option);
+  });
+}
+
 // Runnnnnnnnnnnnnnnn
 
 let provinces;
 
-function runn () {
+function initProvinces () {
   if ( provinces ) {
     document.getElementById('counter').append(branchListView(branchList( postData ), provinces));    
   } else {
@@ -160,8 +178,14 @@ function runn () {
       viewProvincesList(getProvincesList(provinces))
     })
   }
-
-
 }
 
-runn ();
+initProvinces ();
+const inputProvince = document.getElementById("province");
+const inputDistrict = document.getElementById("district");
+
+// Event: input change
+inputProvince.addEventListener('change', (e) => {
+  const targetProvince = e.target.value
+  viewDistrictList(getDistrictList(provinces, targetProvince))
+})
